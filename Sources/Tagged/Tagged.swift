@@ -1,3 +1,5 @@
+import Foundation
+
 @dynamicMemberLookup
 public struct Tagged<Tag, RawValue> {
   public var rawValue: RawValue
@@ -82,7 +84,11 @@ extension Tagged: Encodable where RawValue: Encodable {
   public func encode(to encoder: Encoder) throws {
     do {
       var container = encoder.singleValueContainer()
-      try container.encode(self.rawValue)
+      if let uuid = rawValue as? UUID {
+        try container.encode(uuid.uuidString.lowercased())
+      } else {
+        try container.encode(self.rawValue)
+      }
     } catch {
       try self.rawValue.encode(to: encoder)
     }
